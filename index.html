@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>세 가지 습관</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="세 가지 습관">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#2c2f4a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+*{-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{font-size:14px;-webkit-text-size-adjust:100%}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Do+Hyeon&display=swap">
+<style>
+/* Layout: 휴대용 게임기 화면 — 위 상태줄, 가운데 동료 파티(최대 3마리), 아래 대화창 */
+:root{
+  --bezel:#2c2f4a; --bezel-hi:#3d4166;
+  --screen:#f4f1df; --panel:#ffffff; --ink:#28283a; --muted:#6c6a80; --line:#28283a;
+  --hp:#3cc06a; --hp-mid:#f2c230; --hp-low:#e8503a; --exp:#3f8fe8; --track:#d8d4c0;
+  --pix:"Press Start 2P",ui-monospace,monospace;
+  --kr:"Do Hyeon","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+html,body{background:var(--bezel)}
+body{color:var(--ink);font-family:var(--kr);font-size:16px;line-height:1.45}
+.wrap{max-width:560px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.screen{background:var(--screen);border:4px solid #14152a;border-radius:10px;box-shadow:0 0 0 6px var(--bezel-hi),0 10px 30px rgba(0,0,0,.4);padding:14px;display:flex;flex-direction:column;gap:14px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.top h1{margin:0;font-weight:400;font-size:1.6rem;letter-spacing:.02em}
+.top .date{font-family:var(--pix);font-size:.55rem;color:var(--muted);line-height:1.6}
+.box{background:var(--panel);border:3px solid var(--line);border-radius:8px;box-shadow:inset 0 0 0 2px var(--panel),inset 0 0 0 4px #c9c5b2}
+.rule{padding:8px 12px;font-size:.92rem}
+.rule b{color:var(--exp)}
+
+.party{display:flex;flex-direction:column;gap:12px}
+.mon{padding:12px;display:flex;flex-direction:column;gap:10px}
+.mon.faint .sprite{filter:grayscale(1) brightness(1.1);opacity:.6}
+.row{display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:center}
+.stage{width:84px;height:84px;display:grid;place-items:center;background:radial-gradient(ellipse 60% 18% at 50% 86%,#d9d4bb 98%,transparent) ,var(--screen);border-radius:6px;border:2px solid #e2ddc6}
+.sprite{image-rendering:pixelated;width:72px;height:72px}
+.sprite.hop{animation:hop .6s steps(3) 2}
+.sprite.evolve{animation:evo 1.4s steps(2) 1}
+@keyframes hop{50%{transform:translateY(-8px)}}
+@keyframes evo{0%,20%,40%,60%,80%{filter:brightness(4)}10%,30%,50%,70%,90%{filter:none}}
+.info{min-width:0;display:flex;flex-direction:column;gap:5px}
+.nameline{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.nameline strong{font-weight:400;font-size:1.2rem;overflow-wrap:anywhere}
+.lv{font-family:var(--pix);font-size:.6rem;white-space:nowrap}
+.move{font-size:.88rem;color:var(--muted);overflow-wrap:anywhere}
+.bar{display:grid;grid-template-columns:2.6em 1fr auto;gap:6px;align-items:center}
+.bar label{font-family:var(--pix);font-size:.48rem;color:#e8a33a;background:var(--ink);padding:2px 3px;border-radius:3px;text-align:center}
+.bar.exp label{color:#9cc8ff}
+.meter{height:8px;border:2px solid var(--ink);border-radius:5px;background:var(--track);overflow:hidden}
+.meter i{display:block;height:100%;transition:width .6s steps(8)}
+.bar small{font-family:var(--pix);font-size:.45rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cond{font-family:var(--pix);font-size:.45rem;padding:3px 5px;border-radius:3px;color:#fff;align-self:flex-start}
+.cond.rest{background:#d98a1c}.cond.faint{background:#8b5ad6}.cond.done{background:var(--hp)}.cond.ready{background:var(--exp)}
+
+.acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{font-family:var(--kr);font-size:1.05rem;border:3px solid var(--ink);border-radius:8px;background:#ffd75a;color:var(--ink);padding:6px 16px;cursor:pointer;box-shadow:0 3px 0 var(--ink);transition:transform .05s}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn[aria-pressed="true"]{background:#dfe9d6;color:var(--muted);box-shadow:none;transform:translateY(3px)}
+.btn.small{font-size:.9rem;padding:3px 10px;background:var(--panel)}
+.link{background:none;border:0;font-family:var(--kr);font-size:.9rem;color:var(--muted);cursor:pointer;padding:2px 4px}
+.link:hover{color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--exp);outline-offset:2px}
+
+.log{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.log .wd{font-size:.75rem;color:var(--muted);text-align:center}
+.log button{aspect-ratio:1;max-width:100%;border:2px solid #cfcab4;background:var(--screen);border-radius:3px;cursor:pointer;padding:0;font-family:var(--pix);font-size:.4rem;color:var(--muted)}
+.log button.on{background:var(--hp);border-color:#27884a;color:#fff}
+.log button.gap{background:#f5dfae;border-color:#d98a1c;color:#8a5410}
+.log button.today{border-color:var(--ink)}
+.log button:disabled{opacity:.3;cursor:default}
+
+.new{padding:12px;display:flex;flex-direction:column;gap:8px}
+.new h2{margin:0;font-weight:400;font-size:1.1rem}
+.new form{display:flex;gap:8px;flex-wrap:wrap}
+.new input{flex:1 1 160px;min-width:0;font-family:var(--kr);font-size:1rem;border:3px solid var(--ink);border-radius:8px;padding:6px 10px;background:var(--screen);color:var(--ink)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{font-family:var(--kr);font-size:.9rem;border:2px dashed var(--muted);background:transparent;color:var(--ink);border-radius:6px;padding:2px 9px;cursor:pointer}
+
+.dialog{padding:12px 16px 14px;min-height:3.4em;position:relative;cursor:pointer;font-size:1.08rem}
+.dialog::after{content:"▼";position:absolute;right:12px;bottom:6px;font-size:.7rem;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.status{font-family:var(--pix);font-size:.45rem;color:#aeb2d4;text-align:center;margin-top:14px;line-height:1.8}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="screen">
+    <div class="top">
+      <h1>세 가지 습관</h1>
+      <span class="date" id="today"></span>
+    </div>
+    <div class="box rule"><b>회복 규칙</b> 하루 빠지면 동료가 지쳐요. 다음 날 훈련하면 회복되고, 이틀 연속 빠지면 기절해서 레벨이 0으로 돌아가요.</div>
+    <div class="party" id="party"></div>
+    <div class="box new" id="newBox">
+      <h2>새 동료 부르기 <span style="font-family:var(--pix);font-size:.5rem;color:var(--muted)" id="slots"></span></h2>
+      <form id="add">
+        <input id="hName" maxlength="30" placeholder="매일 할 습관 (예: 물 2L 마시기)" required aria-label="습관 이름">
+        <button class="btn small" type="submit">알 받기</button>
+      </form>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="box dialog" id="dialog" role="status" aria-live="polite"></div>
+  </div>
+  <p class="status" id="status">SAVE: THIS DEVICE</p>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const addDays=(d,n)=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const WD=["월","화","수","목","금","토","일"];
+const IDEAS=["1분 운동 하기","물 2L 마시기","커밋 1개 하기","10분 책 읽기","자기 전 폰 내려놓기"];
+let state={habits:[]};
+
+/* 연속 기록 규칙 (회복 모드) */
+function calc(done){
+  const t=new Date(); let d=done[key(t)]?t:addDays(t,-1);
+  let count=0,miss=0,i=0; const gaps=new Set(), pending=[];
+  while(i++<4000){
+    if(done[key(d)]){count++;miss=0;pending.forEach(k=>gaps.add(k));pending.length=0}
+    else{miss++;if(miss>=2)break;pending.push(key(d))}
+    d=addDays(d,-1);
+  }
+  const rest=!done[key(t)]&&!done[key(addDays(t,-1))]&&count>0;
+  return {count,rest,gaps,ever:Object.keys(done).length>0};
+}
+
+/* 진화 단계 */
+const STAGES=[{at:0,label:"알"},{at:3,label:"아기"},{at:7,label:"성장"},{at:21,label:"최종"}];
+const stageOf=n=>n>=21?3:n>=7?2:n>=3?1:0;
+const nextAt=s=>s<3?STAGES[s+1].at:100;
+
+/* 오리지널 몬스터 도트 생성기 */
+const SPECIES=[
+  {names:["뭉글","뭉실몬","뭉게왕"],body:"#5fc48a",shade:"#33935e",belly:"#c9f0b8"},
+  {names:["퐁당","퐁당몬","파도왕"],body:"#5aa8f0",shade:"#2f6fbf",belly:"#cfe8ff"},
+  {names:["콩돌","단단몬","바위왕"],body:"#e8955a",shade:"#b55e2c",belly:"#ffe2c4"},
+  {names:["반짝","별빛몬","은하왕"],body:"#b28af0",shade:"#7a52c4",belly:"#eadcff"}
+];
+function hash(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function rng(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const OUT="#28283a";
+function drawSprite(cv,h,stage,crack){
+  const sp=SPECIES[hash(h.id)%SPECIES.length];
+  const ctx=cv.getContext("2d"); ctx.clearRect(0,0,cv.width,cv.height);
+  let W,H,g;
+  if(stage===0){
+    W=10;H=12;g=Array.from({length:H},()=>Array(W).fill(0));
+    const r=rng(hash(h.id+"egg"));
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+      const dx=(x+.5-W/2)/(W/2), dy=(y+.5-H*.55)/(H*.5)*(y<H*.55?.92:1.05);
+      if(dx*dx+dy*dy<=1) g[y][x]=r()<.16&&y>1&&y<H-2?"#fff8e0|"+sp.body:"#fff8e0";
+    }
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){const v=g[y][x];if(typeof v==="string"&&v.includes("|"))g[y][x]=v.split("|")[1]}
+    if(crack){[[3,4],[4,5],[5,4],[6,5]].forEach(([x,y])=>{if(g[y][x])g[y][x]=OUT})}
+  }else{
+    W=[0,10,12,14][stage];H=W;g=Array.from({length:H},()=>Array(W).fill(0));
+    const r=rng(hash(h.id+"s"+stage)), half=Math.ceil(W/2);
+    for(let y=1;y<H-1;y++)for(let x=1;x<half;x++){
+      const dx=(x+.5-W/2)/(W/2-1), dy=(y+.5-H*.55)/(H*.45);
+      const d=dx*dx+dy*dy; let on=d<=.55||(d<=1.05&&r()<.55);
+      if(on){g[y][x]=sp.body;g[y][W-1-x]=sp.body}
+    }
+    for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+      if(g[y][x]&&y>H*.55&&Math.abs(x+.5-W/2)<W*.22)g[y][x]=sp.belly;
+      if(g[y][x]&&(!g[y+1]||!g[y+1][x])&&y>H*.4)g[y][x]=sp.shade;
+    }
+    if(stage>=2){const ly=H-1,a=Math.floor(W*.3),b=W-1-a;[a,b].forEach(x=>{g[ly][x]=sp.shade})}
+    if(stage===3){let top=0;while(top<H&&!g[top][half-1])top++;const c=Math.floor(W/2)-1;
+      [[c-2,top-1],[c-2,top-2],[c+3,top-1],[c+3,top-2]].forEach(([x,y])=>{if(y>=0&&x>=0&&x<W)g[y][x]=sp.shade})}
+    const ey=Math.floor(H*.42), ex=Math.max(1,Math.floor(W*.3));
+    let a=ex;while(a<half-1&&!g[ey][a])a++;
+    [a,W-1-a].forEach(x=>{g[ey][x]=OUT;if(g[ey-1])g[ey-1][x]="#ffffff"});
+    g[ey+2][half-1]=OUT;
+  }
+  const S=Math.floor(cv.width/(Math.max(W,H)+2)), ox=Math.floor((cv.width-W*S)/2), oy=Math.floor((cv.height-H*S)/2);
+  const filled=(x,y)=>y>=0&&y<H&&x>=0&&x<W&&g[y][x];
+  ctx.fillStyle=OUT;
+  for(let y=-1;y<=H;y++)for(let x=-1;x<=W;x++){
+    if(!filled(x,y)&&(filled(x+1,y)||filled(x-1,y)||filled(x,y+1)||filled(x,y-1)))ctx.fillRect(ox+x*S,oy+y*S,S,S);
+  }
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(g[y][x]){ctx.fillStyle=g[y][x];ctx.fillRect(ox+x*S,oy+y*S,S,S)}
+  return sp;
+}
+const monName=(h,stage)=>{const sp=SPECIES[hash(h.id)%SPECIES.length];return stage===0?"수상한 알":sp.names[stage-1]};
+
+/* 대화창 */
+let queue=[],typing=null;
+function say(...lines){queue.push(...lines);if(!typing)next()}
+function next(){
+  const el=$("#dialog"); const line=queue.shift();
+  if(line===undefined){typing=null;return}
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){el.textContent=line;typing=setTimeout(next,1400);return}
+  let i=0; el.textContent="";
+  typing=setInterval(()=>{el.textContent=line.slice(0,++i);if(i>=line.length){clearInterval(typing);typing=setTimeout(next,1300)}},35);
+}
+$("#dialog").onclick=()=>{clearInterval(typing);clearTimeout(typing);typing=null;next()};
+
+/* 저장 */
+const KEY="habit-streak-v1"; let ref=null;
+function loadLocal(){try{const v=JSON.parse(localStorage.getItem(KEY)||"null");if(v)state=v}catch(e){}}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}
+  if(ref) ref.set({json:JSON.stringify(state),at:Date.now()}).catch(()=>{$("#status").textContent="SAVE ERROR · 이 기기에는 남아 있어요"});
+}
+async function connect(){
+  if(!window.claude?.use) return;
+  try{
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!db||!user) return; const id=await user.id(); if(!id) return;
+    ref=db.doc("data/users/"+id+"/habits"); let first=true;
+    ref.onSnapshot(s=>{
+      if(s.exists){try{state=JSON.parse(s.data().json);try{localStorage.setItem(KEY,s.data().json)}catch(e){}}catch(e){}}
+      else if(first&&state.habits.length) save();
+      first=false; $("#status").textContent="SAVE: MY ACCOUNT · 나만 볼 수 있어요"; render();
+    },()=>{});
+  }catch(e){}
+}
+
+let openLog=new Set();
+function render(fx){
+  const t=new Date(), tk=key(t);
+  $("#today").textContent=`${t.getFullYear()}.${pad(t.getMonth()+1)}.${pad(t.getDate())} ${["SUN","MON","TUE","WED","THU","FRI","SAT"][t.getDay()]}`;
+  const start=addDays(t,-((t.getDay()+6)%7)-28);
+  $("#party").innerHTML=state.habits.length?state.habits.map(h=>{
+    const c=calc(h.done), on=!!h.done[tk], st=stageOf(c.count), faint=!c.count&&c.ever&&!on;
+    const hp=faint?0:c.rest?35:100, hpc=hp>50?"var(--hp)":hp>20?"var(--hp-mid)":"var(--hp-low)";
+    const lo=STAGES[st].at, hi=nextAt(st), exp=Math.min(100,(c.count-lo)/(hi-lo)*100);
+    const cond=on?`<span class="cond done">OK</span>`:faint?`<span class="cond faint">기절</span>`:c.rest?`<span class="cond rest">지침</span>`:`<span class="cond ready">대기</span>`;
+    let cells="";
+    {cells=WD.map(w=>`<span class="wd">${w}</span>`).join("");
+      for(let i=0;i<35;i++){const d=addDays(start,i),k=key(d),fut=d>t&&k!==tk;
+        cells+=`<button data-h="${h.id}" data-k="${k}" class="${h.done[k]?"on":c.gaps.has(k)?"gap":""} ${k===tk?"today":""}" ${fut?"disabled":""} aria-label="${d.getMonth()+1}월 ${d.getDate()}일 ${h.done[k]?"완료":"미완료"}">${d.getDate()}</button>`}}
+    return `<article class="box mon ${faint?"faint":""}" data-id="${h.id}">
+      <div class="row">
+        <div class="stage"><canvas class="sprite" width="72" height="72" data-s="${h.id}"></canvas></div>
+        <div class="info">
+          <div class="nameline"><strong>${monName(h,st)}</strong><span class="lv">Lv.${c.count}</span></div>
+          <div class="move">기술: ${esc(h.name)}</div>
+          <div class="bar"><label>HP</label><div class="meter"><i style="width:${hp}%;background:${hpc}"></i></div>${cond}</div>
+          <div class="bar exp"><label>EXP</label><div class="meter"><i style="width:${exp}%;background:var(--exp)"></i></div><small>${st<3?`진화까지 ${hi-c.count}일`:"최종 진화"}</small></div>
+        </div>
+      </div>
+      <div class="acts">
+        <button class="btn" data-h="${h.id}" data-k="${tk}" aria-pressed="${on}">${on?"오늘 훈련 완료":"훈련하기!"}</button>
+        <button class="link" data-del="${h.id}" style="margin-left:auto">놓아주기</button>
+      </div>
+      <div class="move" style="margin-bottom:-4px">훈련 일지 · 최근 5주 (날짜를 눌러 고칠 수 있어요)</div>
+      <div class="log">${cells}</div>
+    </article>`}).join(""):`<div class="box mon" style="text-align:center;color:var(--muted)">아직 동료가 없어요. 아래에서 첫 알을 받아보세요.</div>`;
+  state.habits.forEach(h=>{
+    const cv=document.querySelector(`[data-s="${h.id}"]`); if(!cv) return;
+    const c=calc(h.done); drawSprite(cv,h,stageOf(c.count),c.count===2);
+    if(fx&&fx.id===h.id) cv.classList.add(fx.kind);
+  });
+  const full=state.habits.length>=3;
+  $("#newBox").hidden=full;
+  $("#slots").textContent=`${state.habits.length}/3`;
+  $("#chips").innerHTML=IDEAS.filter(n=>!state.habits.some(h=>h.name===n)).map(n=>`<button data-idea="${esc(n)}">${esc(n)}</button>`).join("");
+}
+
+function greet(){
+  if(!state.habits.length){say("어서 와! 매일 지킬 습관을 정하면 알을 하나 줄게.","습관은 3개까지 함께할 수 있어.");return}
+  const t=key(new Date());
+  const tired=state.habits.filter(h=>calc(h.done).rest);
+  const left=state.habits.filter(h=>!h.done[t]);
+  if(tired.length) say(`${monName(tired[0],stageOf(calc(tired[0].done).count))}가 지쳐 보여… 오늘 훈련하면 회복돼!`);
+  else if(left.length) say(`오늘 훈련이 ${left.length}개 남았어.`);
+  else say("오늘 훈련을 전부 마쳤어. 동료들이 뿌듯해 보여!");
+}
+
+function addHabit(name){
+  if(!name||state.habits.length>=3)return;
+  const h={id:uid(),name,done:{}}; state.habits.push(h); save(); render();
+  say(`수상한 알을 받았다!`,`3일 연속 [${name}]을 하면 알이 깨어날 거야.`);
+}
+$("#add").addEventListener("submit",e=>{e.preventDefault();addHabit($("#hName").value.trim());$("#hName").value=""});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.idea){addHabit(b.dataset.idea);return}
+  if(b.dataset.log){openLog.has(b.dataset.log)?openLog.delete(b.dataset.log):openLog.add(b.dataset.log);render();return}
+  if(b.dataset.del){
+    if(!b.dataset.sure){b.dataset.sure=1;b.textContent="정말 놓아줄까요?";return}
+    const h=state.habits.find(x=>x.id===b.dataset.del);
+    state.habits=state.habits.filter(x=>x!==h);save();render();
+    if(h) say(`${monName(h,stageOf(calc(h.done).count))}에게 작별 인사를 했다. 잘 지내!`);return}
+  if(b.dataset.h&&b.dataset.k){
+    const h=state.habits.find(x=>x.id===b.dataset.h); if(!h) return;
+    const before=calc(h.done), sb=stageOf(before.count), wasRest=before.rest, wasFaint=!before.count&&before.ever;
+    const isToday=b.dataset.k===key(new Date());
+    if(h.done[b.dataset.k]) delete h.done[b.dataset.k]; else h.done[b.dataset.k]=1;
+    save();
+    const after=calc(h.done), sa=stageOf(after.count);
+    if(!h.done[b.dataset.k]){render();return}
+    if(sa>sb){
+      render({id:h.id,kind:"evolve"});
+      say(sb===0?"어라…? 알이 흔들린다!":`어라…? ${monName(h,sb)}의 모습이…!`, sb===0?`${monName(h,sa)}가 태어났다!`:`${monName(h,sb)}는 ${monName(h,sa)}로 진화했다!`);
+    }else{
+      render({id:h.id,kind:"hop"});
+      if(!isToday){say(`훈련 일지를 고쳤다. 지금 Lv.${after.count}.`);return}
+      const nm=monName(h,sa);
+      if(wasFaint) say(`${nm}가 다시 일어났다!`,`처음부터 다시 시작이야. 지금 Lv.${after.count}.`);
+      else if(wasRest) say(`${nm}의 [${h.name}]!`,`HP가 회복됐다! 연속 기록이 이어진다.`);
+      else say(`${nm}의 [${h.name}]!`,`훈련은 대성공이었다! Lv.${after.count}이 되었다!`);
+    }
+  }
+});
+loadLocal(); render(); connect(); setTimeout(greet,1200);
+</script>
+
+<script>
+if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
